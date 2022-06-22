@@ -3,7 +3,9 @@
 Status: Scope clarified. Prototyping.
 
 This will be a shell agnostic completions library inspired by
-[shellac](https://gitlab.redox-os.org/AdminXVII/shellac-server).
+[shellac](https://gitlab.redox-os.org/AdminXVII/shellac-server),
+but restricted to static available and cached information with the ultimate aim
+to provide a soft deadline worst case execution time (for non-realtime systems).
 
 #### Goals
 
@@ -18,7 +20,8 @@ size in memory and can further be optimized via lazy loading of completion sourc
 
 - 1. Replies to requests with minimal latency (human perception starts at 10ms input delay).
 - 2. Supports as-you-type completion.
-- 3. Small size. Can be integrated into every shell.
+- 3. Small size. Can be integrated into every shell or where ever needed.
+     (MIT-license and will get relicensed on sufficient usage+completeness to BSD0 or unlicense).
 - 4. Cross-platform.
 - 5. No other dependencies other than Zig compiler, standard library, git and operating system.
 - 6. Handles modifying and deleting configuration files gracefully.
@@ -45,7 +48,20 @@ Fix any of the (well-known) deficits of
 [Kernel filename interfaces](https://github.com/matu3ba/dotfiles_skeleton/blob/main/Filenamesunsafe)
 or
 [standard](https://github.com/matu3ba/dotfiles_skeleton/blob/main/POSIXunsafe).
-The first has a [noteworthy attempt](https://arcan-fe.com/2022/04/02/the-day-of-a-new-command-line-interface-shell/),
+The first has a
+[noteworthy attempt](https://arcan-fe.com/2022/04/02/the-day-of-a-new-command-line-interface-shell/),
 while Kernel deficits don't break unless there are attacks (without feasible workarounds).
 This does especially include the leading dashes problem or other
 [anti patterns for shell programming](https://github.com/matu3ba/chepa).
+
+Introduce Kernel calls to obtain completion information, for example via getting
+all files in the current directory or completing `git status`.
+Getting files in the current directory is typically for performance reasons
+already an in-build and the latter one has
+[an optimized solution](https://github.com/romkatv/gitstatus).
+Any caching of this information will also run eventually into TOCTOU problems
+and only the shell itself knows when filesystem or configuration actions
+with such sideeffects have occured.
+
+**Note**: I doubt that any shell or shell environment will in foreseeable future
+optimize and measure towards worst case execution time.
