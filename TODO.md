@@ -44,7 +44,12 @@
 - string fallback: mark choice for backtracking
 - must evaluate all options in parallel, if there is a regex+string fallback
   and usable results to prevent starting from scratch
-
+  * do everything sounds too costly, but it may work?
+  * do weights help with this?
+  * do we need user input to enable hooks akind to manual lsp completion of editor?
+    + Example: shell reserves one key to mark this a string, one key for a hook
+      (This would fail, if we have multiple slowish hooks)
+      => There is no ideal solution.
 #### Naive approach
 
 - Completion only depends on previous state
@@ -53,10 +58,10 @@
 #### Planned approach
 
 - [ ] represent "added key x", "removed one key", "changed text at position x to y to z"
-- [ ] prototype how costly storing all possible options and pruning with
-      user-defined weighting is
+- [ ] prototype how costly storing all possible options and pruning is
 - [ ] prototype a simple analysis tool for user to set good weights
 - [ ] prototype simple recursive git commands + user strings
+- [ ] prototype user-defined weighting or how to take into account hooks and their time cost
 
 A bad result of prototyping means that we must remove either recursion or regexes/"string".
 I don't think backtracking is useful, since we don't know what we have missed.

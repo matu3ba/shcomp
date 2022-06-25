@@ -1,0 +1,72 @@
+## This is an example for a naive cli grammar
+# Each file must be ascii encoded. Followup versions of the standard may change this to Utf-8.
+
+# The rules for static completion can be understood as
+# "general recursive PEG with user-annotated weights and simplified regex"
+# - General recursive means more general than left- or rightrecursive
+# - User-annotated weights exist to resolve ambiguity and they will be static
+# - For example, an escape exists to opt out of completion with a "string"
+# - Simplified regex means no nested repititions of (*,+) and no (lookahead,lookback) etc
+
+# Backtracking is planned for later, but the debug infrastructure can be reused for that.
+# The idea is to keep a trace of applied rules from the PEG.
+# Spelling corrections are non-goals and diametral to the performance goals.
+# It will be expected to use third-party projects to generate possible corrections.
+
+# use the same symbols as CLAP
+```clig
+|     # alternatives (generally inside parentheses or optional bloc)
+[]    # optional argument
+=>    # concatenation (continuation in next argument)
+*     # repeat any number of time
++     # repeat one or more time
+(A-Z)+(0-9)* # Without quotation, capital letters mark a rule
+'a'   # Quotes must have at least 1 character inside
+r'a'  # regular expressions are a string prefixed with r.
+      # ((a*)|b)* is invalid, because nested repeating.
+      # TODO proper specification of "simple regex" to define words.
+h'hookname'100 # hook with name and default timeout in microseconds
+      # Note that the user of the api is able to overwrite the defaults by
+      # 1. enable + disable dynamic hooks, 2. overwrite timeouts
+      # Hooks are a potential security threat, so the user is forced to
+      # enable them.
+      # They will be at first in-tree for experimentation and to keep things simple, but later moved.
+str   # SPECIAL: String is the fallback of "a complex regex" or arbitrary string input
+      # A hook can be used instead.
+```
+
+
+# The followup symbol of start must be a word or alternatives of words as
+# corresponding binary name.
+# There must be one symbol on the left and at least one on the right.
+# Capital letters show the next rule to evaluate and absence means that this branch
+# terminates evaluation.
+# Here A may be evaluated further and 'ls' leads to termination.
+```clig
+start => 'ls' | 'ls' A
+A     => '-a' | '--help'
+```
+
+# A potential extension, if necessary, includes adding weights that would look like
+```clig
+start => 'ls' | 'ls' A
+A     => 0.5 '-a' B | 0.5 '-s' C
+B     => str
+```
+
+# TODO: Experiment, if groups of things make the grammar significantly more dense.
+# <…>   # delimits tags these correspond to groups of things that might be completed
+# TODO: Experiment, if weights are necessary in practice
+#       to resolve ambiguity.
+
+# Weights are in front of every rule as fraction of 1 and >0.
+# They take effect, if there is ambiguity on which rule to take.
+# TODO:
+# - do we really need weights? try first without to see, if performance is sufficient.
+# - dynamic input keyword reserving + timeout?
+
+# TODO details:
+# - when to throw away other parsing tries (think of regex vs "allstring")
+# - when to throw away old results on typing
+# - how unmatched restores on deletion should work => They will be necessary,
+#   if we take into account hooks and their time cost.
