@@ -13,7 +13,7 @@
 # Spelling corrections are non-goals and diametral to the performance goals.
 # It will be expected to use third-party projects to generate possible corrections.
 
-# use the same symbols as CLAP
+# symbols inspired by CLAP
 ```clig
 |     # alternatives (generally inside parentheses or optional bloc)
 []    # optional argument
@@ -28,30 +28,38 @@ r'a'  # regular expressions are a string prefixed with r.
 h'hookname'100 # hook with name and default timeout in microseconds
       # Note that the user of the api is able to overwrite the defaults by
       # 1. enable + disable dynamic hooks, 2. overwrite timeouts
-      # Hooks are a potential security threat, so the user is forced to
-      # enable them.
+      # Hooks are a potential security threat, so the user is forced to enable them.
       # They will be at first in-tree for experimentation and to keep things simple, but later moved.
+      # Hooks may modify the last input word xor append a word and can read-only
+      # access the whole parse trace.
 str   # SPECIAL: String is the fallback of "a complex regex" or arbitrary string input
-      # A hook can be used instead.
 ```
-
 
 # The followup symbol of start must be a word or alternatives of words as
 # corresponding binary name.
 # There must be one symbol on the left and at least one on the right.
 # Capital letters show the next rule to evaluate and absence means that this branch
-# terminates evaluation.
+# terminates evaluation in all cases.
 # Here A may be evaluated further and 'ls' leads to termination.
+# f_A means that 'ls' is potentially final => rule A can be also ommitted
 ```clig
-start => 'ls' | 'ls' A
+start => 'ls' f_A
 A     => '-a' | '--help'
+```
+
+# Usage of hooks is shown in the following
+```clig
+start => 'chmod' f_A
+#A     => str h'hookname'100
+A     => h'hookname'100 f_A
 ```
 
 # A potential extension, if necessary, includes adding weights that would look like
 ```clig
-start => 'ls' | 'ls' A
+start => 'ls' f_A
 A     => 0.5 '-a' B | 0.5 '-s' C
 B     => str
+C     => str
 ```
 
 # TODO: Experiment, if groups of things make the grammar significantly more dense.

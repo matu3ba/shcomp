@@ -1,0 +1,36 @@
+# This is a grammar file example, for simplicity for ls from GNU coreutils
+#start => 'lsblk' | 'lsblk' A
+# PROBLEM: we may have lsblk -A -D -E etc, such that A => '-A | '-A' A
+# become duplications
+#A     => '-A' | '--all' |
+# SOLUTION: add an annotation f_A for potentially final
+# PROBLEM: -A is useless for completion
+# SOLUTION: read the man page for the short flag version, because we are only to complete
+#           and validate correct flags (and order, if specified)
+
+# PROBLEM: user wants at maximum 1 occurence of flag per command
+# SOLUTION: specify, if flag can occur multiple times?
+# PROBLEM OF SOLUTION: What if I want it to occur a single time until next special flag?
+# => "flag existence" must be deleted either 1. by flag addition marking where its
+#     existence gets deleted or 2. defining the action at the rule
+#     (what existence info to restore/delete)
+# => hook can do this
+
+# PROBLEM: user wants at maximum 1 occurence of character in word (chmod +xwrw is invalid)
+# SOLUTION: special rule for word with related problems of 1 occurence of flag per command
+# PROBLEM OF SOLUTION: ???
+
+# PROBLEM: What would a hook get as arguments and what would it return?
+# SOLUTION: They get a "read-only view" of the current parser state (for the current
+#           selected trace) except for current word to modify+complete
+#           the next word and validate the complete trace
+
+# unknown use case: user wants exactly 1 occurence of flag per scope?!
+# OBSERVATION: Any level of computations must be avoided to prevent feature creep.
+# OBSERVATION: Hooks require a clean parser interface. Hooks must not mess up the
+# parser state by adjusting previous states other than the current one.
+
+start => 'lsblk' f_A
+Opts  => '-A' f_Opts | '--noempty' f_Opts | '-D' f_Opts | '--discard' f_Opts
+         '-E' S | '--dedup' S | '-I' L | '--include' L
+         '-J' f_Opts | '--json' f_Opts

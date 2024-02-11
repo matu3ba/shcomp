@@ -1,0 +1,21 @@
+# CligVersion 0.1
+# Origin https://github.com/matu3ba/shcomp
+# Subpath ./test/ls.clig
+
+start => 'ls' f_Opts
+Opts  =>    '--help' | '--version'
+          | '-c' f_Opts | '--bytes' f_Opts
+          | '-m' f_Opts | '--chars' f_Opts
+          | '-l' f_Opts | '--lines' f_Opts
+          | '-files0-from' word f_Opts
+          | '-L' f_Opts | '--lines' f_Opts
+          | '-L' f_Opts | '--max-line-length' f_Opts
+          | '-L' f_Opts | '--max-line-length' f_Opts
+          | '-w' f_Opts | '--words' f_Opts
+
+# fragments
+# 1. header
+# 2. rules
+# rules
+# start => ...
+# comments after rule are not allowed, only in newlines

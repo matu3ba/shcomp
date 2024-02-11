@@ -1,6 +1,10 @@
 ## Shell completion library
 
-Status: Scope clarified. Prototyping.
+Status: Incorrect approach. Should not use a DSL, but a standard format like
+json to express necessary data and advanced functionality should ask the
+program directly.
+
+Use https://github.com/00JCIV00/cova instead.
 
 This will be a shell agnostic completions library inspired by
 [shellac](https://gitlab.redox-os.org/AdminXVII/shellac-server),
@@ -8,6 +12,11 @@ but restricted to static available and cached information with the ultimate aim
 to provide a soft deadline worst case execution time (for non-realtime systems).
 
 #### Goals
+
+TODO: briefly explain how hooks as time-limited extensions should work
+and adjust goals accordingly. Otherwise, git branch completion or zig build
+completion will not work as we need to execute and parse things.
+
 
 The main difference in goals of the author is dynamic completions, which the author
 believes to runs counter to keeping things simple and fast via caching.
@@ -65,3 +74,10 @@ with such sideeffects have occured.
 
 **Note**: I doubt that any shell or shell environment will in foreseeable future
 optimize and measure towards worst case execution time.
+
+#### TODOs
+
+Use case:
+1. Get the most simple `zig build` completion for projects running for zsh.
+2. Compare against https://github.com/ziglang/shell-completions
+3. Perf against zsh modules or naive completion functions
